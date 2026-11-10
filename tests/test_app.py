@@ -33,6 +33,35 @@ class AppTests(unittest.TestCase):
         self.assertIsNotNone(importlib.util.find_spec('app'), 'Application module is required')
         return importlib.import_module('app').Application(self.metadata, self.receipt)
 
+    def test_v2_source_permalink_is_exact_and_safe(self):
+        from html.parser import HTMLParser
+        class Links(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.links = []
+            def handle_starttag(self, tag, attrs):
+                if tag == 'a': self.links.append(dict(attrs))
+        for commit in ['a'*40, '0123456789abcdef'*2+'01234567']:
+            self.metadata.write_text(json.dumps(dict(build(commit), release='1.0.1')))
+            self.receipt.write_text(json.dumps(receipt(commit)))
+            application = self.app()
+            expected = REPO+'/commit/'+commit
+            status, _, body = application.response('/version')
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(body), dict(schema_version=1,
+                **dict(build(commit), release='1.0.1'), source_url=expected,
+                deployment={'id':'synthetic-test-only','deployed_at':'2026-01-01T00:01:00Z'}))
+            parser = Links()
+            html = application.response('/')[2].decode()
+            parser.feed(html)
+            link = next(link for link in parser.links if link.get('href') == expected)
+            self.assertEqual(link['target'], '_blank')
+            self.assertEqual(set(link['rel'].split()), {'noopener','noreferrer'})
+            self.assertIn('查看此部署的原始碼', html)
+            self.receipt.unlink()
+            self.assertEqual(application.response('/version')[0], 503)
+            self.assertNotIn(expected, application.response('/')[2].decode())
+
     def test_version_reports_build_and_deployment(self):
         status, content_type, body = self.app().response('/version')
         self.assertEqual(status, 200)
@@ -40,9 +69,68 @@ class AppTests(unittest.TestCase):
         self.assertEqual(json.loads(body), dict(schema_version=1, **build(),
             deployment={'id':'synthetic-test-only', 'deployed_at':'2026-01-01T00:01:00Z'}))
 
+    def test_v2_source_uses_cached_validated_metadata_only(self):
+        import os
+        from unittest.mock import patch
+        valid = dict(build(), release='1.0.1')
+        for change in [dict(source_url='javascript:alert(1)'),
+                       dict(commit='a'*39), dict(commit='a'*41),
+                       dict(commit='A'*40), dict(commit='a'*39+'"'),
+                       dict(repository_url='javascript:alert(1)'),
+                       dict(repository_url=REPO+'/'),
+                       dict(repository_url='https://user:SECRET@github.com/timmypai/agent-delivery-status')]:
+            with self.subTest(change=change):
+                self.metadata.write_text(json.dumps(dict(valid, **change)))
+                with self.assertRaises(ValueError): self.app()
+        self.metadata.write_text(json.dumps(valid))
+        application = self.app()
+        self.metadata.write_text(json.dumps(dict(build('c'*40), release='1.0.1')))
+        self.receipt.write_text(json.dumps(dict(receipt(), id='<script>"&</script>')))
+        with patch.dict(os.environ, {'COMMIT':'d'*40,'SOURCE_URL':'javascript:alert(1)'}):
+            self.assertEqual(json.loads(application.response('/version')[2])['source_url'], REPO+'/commit/'+'a'*40)
+            html = application.response('/')[2].decode()
+            self.assertIn('&lt;script&gt;&quot;&amp;&lt;/script&gt;', html)
+            self.assertNotIn('<script>', html)
+            self.assertNotIn('javascript:', html)
+
+    def test_real_http_v2_permalink_and_receipt_failure(self):
+        import http.client
+        import threading
+        self.metadata.write_text(json.dumps(dict(build(), release='1.0.1')))
+        server = importlib.import_module('app').make_server(self.app(), '127.0.0.1', 0)
+        thread = threading.Thread(target=server.serve_forever)
+        def cleanup():
+            server.shutdown(); thread.join(timeout=3); server.server_close()
+        self.addCleanup(cleanup)
+        thread.start()
+        def request(path, method='GET'):
+            connection = http.client.HTTPConnection('127.0.0.1', server.server_port, timeout=3)
+            try:
+                connection.request(method, path)
+                response = connection.getresponse()
+                return response.status, dict(response.getheaders()), response.read()
+            finally:
+                connection.close()
+        expected = REPO+'/commit/'+'a'*40
+        status, headers, body = request('/version')
+        self.assertEqual(status, 200)
+        self.assertEqual(headers['Cache-Control'], 'no-store')
+        self.assertEqual(json.loads(body), dict(schema_version=1,
+            **dict(build(), release='1.0.1'), source_url=expected,
+            deployment={'id':'synthetic-test-only','deployed_at':'2026-01-01T00:01:00Z'}))
+        self.assertIn('href="'+expected+'"', request('/')[2].decode())
+        self.assertEqual(request('/version', 'HEAD')[2], b'')
+        self.assertEqual(request('/version', 'POST')[0], 405)
+        self.receipt.write_text(json.dumps(receipt('b'*40)))
+        for path in ['/', '/version', '/healthz']:
+            self.assertEqual(request(path)[0], 503)
+            self.assertNotIn(expected.encode(), request(path)[2])
+        self.receipt.write_text(json.dumps(receipt()))
+        self.assertEqual(json.loads(request('/version')[2])['source_url'], expected)
+
     def test_invalid_build_rejected(self):
         mutations = [(k, None) for k in build()] + [
-            ('release', '1.0.1'), ('commit','A'*40), ('commit','a'*39),
+            ('release', '1.0.2'), ('commit','A'*40), ('commit','a'*39),
             ('built_at','2026-02-30T00:00:00Z'), ('built_at','2026-01-01'),
             ('repository_url', REPO+'/'), ('evidence', []),
         ]

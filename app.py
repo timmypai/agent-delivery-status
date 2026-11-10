@@ -48,7 +48,7 @@ def validate_build(data):
     try:
         if set(data) != {'release','commit','built_at','repository_url','evidence'}:
             raise ValueError()
-        if data['release'] != '1.0.0' or not matches(SHA, data['commit']):
+        if data['release'] not in ('1.0.0', '1.0.1') or not matches(SHA, data['commit']):
             raise ValueError()
         timestamp(data['built_at'])
         if data['repository_url'] != REPOSITORY:
@@ -93,6 +93,8 @@ class Application:
         except ValueError:
             receipt = None
         healthy = receipt is not None
+        source_url = (self._build['repository_url']+'/commit/'+self._build['commit']
+                      if self._build['release'] == '1.0.1' else None)
         status = 200 if healthy else 503
         health = {'status':'ok' if healthy else 'unavailable', 'checks':
                   {'build_metadata':'ok','deployment_receipt':'ok' if healthy else 'invalid'}}
@@ -101,6 +103,8 @@ class Application:
         elif path == '/version':
             data = dict(schema_version=1, **self._build,
                         deployment={k:receipt[k] for k in ('id','deployed_at')}) if healthy else {'error':'metadata_unavailable'}
+            if healthy and source_url is not None:
+                data['source_url'] = source_url
         else:
             html = '<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>Delivery Status</title><h1>Delivery Status</h1>'
             html += '<p>本機健康（非交付驗收）: '+health['status']+'</p>'
@@ -110,6 +114,8 @@ class Application:
                      ('Built at',self._build['built_at']),('Deployment',receipt['id'])])+'</dl>'
                 html += '<nav>'+''.join('<a target="_blank" rel="noopener noreferrer" href="'+escape(url,quote=True)+'">'+label+'</a> '
                     for label,url in zip(('Issue','PR','CI'), (self._build['evidence'][k] for k in ('issue_url','pr_url','ci_url'))))+'</nav>'
+                if source_url is not None:
+                    html += '<a target="_blank" rel="noopener noreferrer" href="'+escape(source_url,quote=True)+'">查看此部署的原始碼</a>'
             return status, 'text/html; charset=utf-8', (html+'</html>').encode()
         return status, 'application/json', json.dumps(data).encode()
 

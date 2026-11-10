@@ -26,7 +26,7 @@ class BuildTests(unittest.TestCase):
             data = json.loads(output.read_text())
             actual = subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
             self.assertEqual(data['commit'],actual)
-            self.assertEqual(data['release'],'1.0.0')
+            self.assertEqual(data['release'],'1.0.1')
             self.assertNotIn('image_digest',data)
             from app import validate_build
             validate_build(data)

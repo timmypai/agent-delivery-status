@@ -1,0 +1,276 @@
+test_html_escapes_values_and_links_are_safe (test_app.AppTests.test_html_escapes_values_and_links_are_safe) ... FAIL
+test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) ... 
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='release', value=None) ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='commit', value=None) ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='built_at', value=None) ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='repository_url', value=None) ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='evidence', value=None) ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='release', value='1.0.1') ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='commit', value='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='commit', value='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa') ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='built_at', value='2026-02-30T00:00:00Z') ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='built_at', value='2026-01-01') ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='repository_url', value='https://github.com/timmypai/agent-delivery-status/') ... FAIL
+  test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='evidence', value=[]) ... FAIL
+test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) ... FAIL
+test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) ... 
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data=None) ... ERROR
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data=[]) ... ERROR
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={}) ... ERROR
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 'synthetic-test-only', 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'cccccccccccccccccccccccccccccccccccccccc', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'}) ... FAIL
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 'synthetic-test-only', 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bad'}) ... FAIL
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': '', 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'}) ... FAIL
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 123, 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'}) ... FAIL
+  test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 'synthetic-test-only', 'deployed_at': 'yesterday', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'}) ... FAIL
+test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) ... ERROR
+test_runtime_environment_cannot_replace_cached_build (test_app.AppTests.test_runtime_environment_cannot_replace_cached_build) ... ok
+test_unknown_paths_are_not_files (test_app.AppTests.test_unknown_paths_are_not_files) ... FAIL
+test_version_reports_build_and_deployment (test_app.AppTests.test_version_reports_build_and_deployment) ... ok
+
+======================================================================
+ERROR: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+                     ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/data/agent-team/projects/delivery-status/repo/app.py", line 13, in response
+    deployment={k: receipt[k] for k in ('id', 'deployed_at')})
+                   ~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable
+
+======================================================================
+ERROR: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data=[])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+                     ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/data/agent-team/projects/delivery-status/repo/app.py", line 13, in response
+    deployment={k: receipt[k] for k in ('id', 'deployed_at')})
+                   ~~~~~~~^^^
+TypeError: list indices must be integers or slices, not str
+
+======================================================================
+ERROR: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+                     ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/data/agent-team/projects/delivery-status/repo/app.py", line 13, in response
+    deployment={k: receipt[k] for k in ('id', 'deployed_at')})
+                   ~~~~~~~^^^
+KeyError: 'id'
+
+======================================================================
+ERROR: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 90, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/healthz')[0],503)
+                     ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/data/agent-team/projects/delivery-status/repo/app.py", line 11, in response
+    receipt = json.loads(self.receipt_path.read_text())
+  File "/opt/hermes/tools/python-3.14.9+20261021-linux-arm64/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/hermes/tools/python-3.14.9+20261021-linux-arm64/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hermes/tools/python-3.14.9+20261021-linux-arm64/lib/python3.14/json/decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
+
+======================================================================
+FAIL: test_html_escapes_values_and_links_are_safe (test_app.AppTests.test_html_escapes_values_and_links_are_safe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 101, in test_html_escapes_values_and_links_are_safe
+    self.assertEqual((status,kind),(200,'text/html; charset=utf-8'))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (200, 'application/json') != (200, 'text/html; charset=utf-8')
+
+First differing element 1:
+'application/json'
+'text/html; charset=utf-8'
+
+- (200, 'application/json')
++ (200, 'text/html; charset=utf-8')
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='release', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='commit', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='built_at', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='repository_url', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='evidence', value=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='release', value='1.0.1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='commit', value='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='commit', value='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='built_at', value='2026-02-30T00:00:00Z')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='built_at', value='2026-01-01')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='repository_url', value='https://github.com/timmypai/agent-delivery-status/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected) (key='evidence', value=[])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 53, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_invalid_build_rejected (test_app.AppTests.test_invalid_build_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 57, in test_invalid_build_rejected
+    with self.assertRaises(ValueError): self.app()
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 'synthetic-test-only', 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'cccccccccccccccccccccccccccccccccccccccc', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 503
+
+======================================================================
+FAIL: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 'synthetic-test-only', 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bad'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 503
+
+======================================================================
+FAIL: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': '', 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 503
+
+======================================================================
+FAIL: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 123, 'deployed_at': '2026-01-01T00:01:00Z', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 503
+
+======================================================================
+FAIL: test_receipt_invalidates_immediately_and_recovers (test_app.AppTests.test_receipt_invalidates_immediately_and_recovers) (data={'id': 'synthetic-test-only', 'deployed_at': 'yesterday', 'commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'image_digest': 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 81, in test_receipt_invalidates_immediately_and_recovers
+    self.assertEqual(app.response('/version')[0], 503)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 503
+
+======================================================================
+FAIL: test_unknown_paths_are_not_files (test_app.AppTests.test_unknown_paths_are_not_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 113, in test_unknown_paths_are_not_files
+    self.assertEqual(self.app().response(path)[0],404)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 404
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.223s
+
+FAILED (failures=20, errors=4)

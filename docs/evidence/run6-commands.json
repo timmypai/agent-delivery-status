@@ -1,0 +1,27 @@
+[
+  {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python -m unittest -v tests.test_app.AppTests.test_version_reports_build_and_deployment tests.test_app.AppTests.test_invalid_build_rejected tests.test_app.AppTests.test_receipt_invalidates_immediately_and_recovers tests.test_app.AppTests.test_html_escapes_values_and_links_are_safe tests.test_app.AppTests.test_unknown_paths_are_not_files tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed tests.test_app.AppTests.test_runtime_environment_cannot_replace_cached_build tests.test_app.AppTests.test_missing_metadata_process_fails_without_traceback tests.test_app.AppTests.test_invalid_build_processes_fail_without_socket_or_secret tests.test_app.AppTests.test_strict_schema_types_and_boundaries tests.test_build.BuildTests",
+    "exit": 0,
+    "log": "/opt/data/agent-team/projects/delivery-status/repo/.delivery/run6-final-offline.txt"
+  },
+  {
+    "command": "PYTHONPYCACHEPREFIX=/opt/data/agent-team/projects/delivery-status/repo/.cache/pycache python -m compileall -q app.py scripts tests",
+    "exit": 0,
+    "log": "/opt/data/agent-team/projects/delivery-status/repo/.delivery/run6-final-syntax.txt"
+  },
+  {
+    "command": " sh -n scripts/build-image.sh",
+    "exit": 0,
+    "log": "/opt/data/agent-team/projects/delivery-status/repo/.delivery/run6-final-shell.txt"
+  },
+  {
+    "command": "GIT_OPTIONAL_LOCKS=0 git -c core.fsmonitor=false -c core.hooksPath=/dev/null diff --check",
+    "exit": 0,
+    "log": "/opt/data/agent-team/projects/delivery-status/repo/.delivery/run6-final-diff-check.txt"
+  },
+  {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python docs/evidence/run6-static-check.py",
+    "exit": 0,
+    "log": "/opt/data/agent-team/projects/delivery-status/repo/.delivery/run6-final-static.txt"
+  }
+]

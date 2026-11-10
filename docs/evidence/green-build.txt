@@ -1,0 +1,7 @@
+test_container_and_workflow_definition_boundaries (test_build.BuildTests.test_container_and_workflow_definition_boundaries) ... ok
+test_metadata_producer_requires_evidence_and_uses_actual_head (test_build.BuildTests.test_metadata_producer_requires_evidence_and_uses_actual_head) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.133s
+
+OK

@@ -1,0 +1,42 @@
+test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) ... 
+  test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) (ident="'\\ud800'") ... ERROR
+  test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) (ident="'\\udfff'") ... ERROR
+  test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) (ident="'bad\\x7fid'") ... FAIL
+
+======================================================================
+ERROR: test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) (ident="'\\ud800'")
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 121, in test_invalid_unicode_receipt_fails_closed
+    self.assertEqual(app.response(path)[0], 503)
+                     ~~~~~~~~~~~~^^^^^^
+  File "/opt/data/agent-team/projects/delivery-status/repo/app.py", line 112, in response
+    return status, 'text/html; charset=utf-8', (html+'</html>').encode()
+                                               ~~~~~~~~~~~~~~~~~~~~~~~^^
+UnicodeEncodeError: 'utf-8' codec can't encode character '\ud800' in position 301: surrogates not allowed
+
+======================================================================
+ERROR: test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) (ident="'\\udfff'")
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 121, in test_invalid_unicode_receipt_fails_closed
+    self.assertEqual(app.response(path)[0], 503)
+                     ~~~~~~~~~~~~^^^^^^
+  File "/opt/data/agent-team/projects/delivery-status/repo/app.py", line 112, in response
+    return status, 'text/html; charset=utf-8', (html+'</html>').encode()
+                                               ~~~~~~~~~~~~~~~~~~~~~~~^^
+UnicodeEncodeError: 'utf-8' codec can't encode character '\udfff' in position 301: surrogates not allowed
+
+======================================================================
+FAIL: test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) (ident="'bad\\x7fid'")
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 121, in test_invalid_unicode_receipt_fails_closed
+    self.assertEqual(app.response(path)[0], 503)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 200 != 503
+
+----------------------------------------------------------------------
+Ran 1 test in 0.023s
+
+FAILED (failures=1, errors=2)

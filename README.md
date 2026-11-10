@@ -1,4 +1,4 @@
-# Delivery Status 1.0.0
+# Delivery Status 1.0.1
 
 Python standard-library read-only service: `GET`/`HEAD` `/`, `/healthz`, `/version`.
 No database, runtime GitHub calls, credentials, write API or background poller.
@@ -22,7 +22,8 @@ The Developer lane runs only the explicit offline subset below. Full discovery
 unconditionally includes real HTTP tests and is required in the independent
 Reviewer lane at the sealed commit. It is **NOT VERIFIED in the Developer lane**.
 The historical socket/cache failures remain in `docs/evidence/repo-night-v1.md`;
-the changed lane does not erase them. Latest evidence: `docs/evidence/run6.md`.
+the changed lane does not erase them. v1 evidence: `docs/evidence/run6.md`;
+v2 candidate evidence: `docs/evidence/repo-night-v2.md`.
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python -m unittest -v \
@@ -36,12 +37,27 @@ PYTHONDONTWRITEBYTECODE=1 python -m unittest -v \
   tests.test_app.AppTests.test_missing_metadata_process_fails_without_traceback \
   tests.test_app.AppTests.test_invalid_build_processes_fail_without_socket_or_secret \
   tests.test_app.AppTests.test_strict_schema_types_and_boundaries \
+  tests.test_app.AppTests.test_v2_source_permalink_is_exact_and_safe \
+  tests.test_app.AppTests.test_v2_source_uses_cached_validated_metadata_only \
   tests.test_build.BuildTests
 ```
 
-This is not an alternative acceptance command. It excludes exactly the real
+This is not an alternative acceptance command. It excludes the real
 HTTP tests `test_real_http_contract` and
-`test_real_http_negative_receipts_in_child_process`, neither skipped nor mocked.
+`test_real_http_negative_receipts_in_child_process`, plus
+`test_real_http_v2_permalink_and_receipt_failure`; none is skipped or mocked.
+
+## v2 source permalink
+
+For release `1.0.1`, `/version` adds `source_url`, exactly
+`repository_url + '/commit/' + commit`, and the page provides
+「查看此部署的原始碼」 as a clickable, escaped, safely opened link.
+It uses only the validated cached build identity, never a runtime environment
+override or caller-supplied URL. Invalid receipts still produce 503 without a
+source link. Schema version 1 and all existing fields/validation remain intact.
+Legacy `1.0.0` metadata retains its exact response without `source_url`; clients
+must tolerate that field being absent when rolling back to v1. The build producer
+now reads `1.0.1` from VERSION. Private links require the viewer's own GitHub access.
 
 ## Metadata and startup
 
@@ -112,6 +128,7 @@ readbacks and deployment verification remain outstanding. Do not treat future
 `test` success alone as release PASS. No workflow uploads/pushes artifacts/images.
 
 **CI NOT RUN. Docker NOT BUILT. Oracle NOT DEPLOYED. No push or PR by Developer.**
-Independent review and Git sealing are pending. The original cloud root remains
-held. This repository work is not cloud acceptance. v2 is a separate authorized
-incremental change after v1 independent review, not part of this implementation.
+v1 received independent local full-suite approval at
+`d5db299057d7c28c884f4238db8e4f562c5b85fa`. v2 Git sealing and independent
+full-suite review are pending. The original cloud root remains held.
+This is a repo-only second revision, not a second deployed release.

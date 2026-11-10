@@ -89,8 +89,12 @@ def smoke(image, metadata, directory):
             assert get[0] == head[0] == 200 and head[2] == b''
             assert get[1]['Content-Length'] == head[1]['Content-Length']
         version = json.loads(request('GET', '/version')[2])
-        assert version == dict(schema_version=1, **metadata,
-                               deployment={k:good[k] for k in ('id','deployed_at')})
+        expected = dict(schema_version=1, **metadata,
+                        deployment={k:good[k] for k in ('id','deployed_at')})
+        if metadata['release'] == '1.0.1':
+            expected['source_url'] = metadata['repository_url']+'/commit/'+metadata['commit']
+            assert 'href="'+expected['source_url']+'"' in request('GET', '/')[2].decode()
+        assert version == expected
         assert request('POST', '/version')[0] == 405
         assert request('GET', '/../build-metadata.json')[0] == 404
         for invalid in [dict(good, commit=fake), {}, dict(good, image_digest='bad')]:

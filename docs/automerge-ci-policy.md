@@ -52,9 +52,23 @@ https://github.com/actions/setup-python/releases/tag/v7.1.0.
 Checkout uses event PR **head.sha**, persist-credentials=false. Each job's
 `scripts/ci_pr.py` confirms actual git HEAD == event head; checks same-repo public
 event and live PR identity/head/base/state, and validates real linked Issue API
-identity (not a PR). PR2 must close Issue1; PR4 must close Issue3. Future same-repo
-PRs must contain exactly one standalone `Closes #N`, `Fixes #N` or `Resolves #N`
-line, with a real same-repo issue, or admission fails clearly. Forks fail closed.
+identity (not a PR). PR2 must close Issue1; PR4 must close Issue3. In addition to
+bare closing lines, admission accepts these exact existing historical lines only
+for their corresponding scoped PR (verified by GET-only live projections):
+
+- PR2: `Closes #1 (repository milestone only).`
+- PR4: `Closes #3 (repository milestone only): https://github.com/timmypai/agent-delivery-status/issues/3`
+
+This is narrow local parser compatibility, not a prerequisite remote body edit.
+Suffixes are compared as data, never executed or fetched. Other suffixes, wrong
+issue/repository/URL, query/fragment/userinfo and injection-shaped lines fail.
+All standalone closing-keyword lines are counted before parsing, so a valid line
+cannot hide an additional malformed or cross-repository closing reference.
+Future same-repo PRs must contain exactly one standalone `Closes #N`, `Fixes #N`
+or `Resolves #N` line (case-insensitive, optional trailing period), with a real
+same-repo issue, or admission fails clearly. Forks fail closed. Behavioral tests
+exercise these actual-format fixtures, ambiguity/security negatives and future-PR
+controls; they do not mock or replace genuine HTTP/negative integration tests.
 
 Only metadata admission has a step-local read-only `github.token` as GH_TOKEN.
 Permissions: contents, pull-requests, issues, actions, checks read only. No write

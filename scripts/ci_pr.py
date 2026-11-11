@@ -18,11 +18,27 @@ SHA = re.compile(r'[0-9a-f]{40}')
 
 
 def linked_issue(number, body):
-    # Deliberately fail closed on absent/ambiguous/cross-repository references.
-    links = re.findall(r'(?im)^\s*(?:closes|fixes|resolves)\s+#([1-9][0-9]*)\s*[.]?\s*$', body or '')
-    if len(links) != 1:
-        raise ValueError('exactly one standalone same-repo Closes/Fixes/Resolves #N required')
-    issue = int(links[0])
+    # Count ALL closing-keyword lines before validating one. Otherwise a valid
+    # line can mask a second malformed/cross-repository/injection-shaped link.
+    lines = [line.strip() for line in (body or '').splitlines()
+             if re.match(r'(?i)^[ \t]*(?:closes|fixes|resolves)\b', line)]
+    if len(lines) != 1:
+        raise ValueError('exactly one standalone same-repo closing reference required')
+    line = lines[0]
+    # Narrow compatibility for the two existing scoped PR bodies. The URL is
+    # compared as data only; it is never fetched, logged or evaluated by shell.
+    historical = {
+        2: ('Closes #1 (repository milestone only).', 1),
+        4: ('Closes #3 (repository milestone only): '
+            'https://github.com/'+REPO+'/issues/3', 3),
+    }
+    if number in historical and line == historical[number][0]:
+        issue = historical[number][1]
+    else:
+        match = re.fullmatch(r'(?i)(?:closes|fixes|resolves)[ \t]+#([1-9][0-9]*)[ \t]*\.?', line)
+        if match is None:
+            raise ValueError('unsupported closing reference; use standalone Closes #N')
+        issue = int(match[1])
     if number in (2, 4) and issue != {2: 1, 4: 3}[number]:
         raise ValueError('scoped PR/Issue mapping mismatch')
     return issue

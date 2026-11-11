@@ -101,6 +101,60 @@ class CIPolicyTests(unittest.TestCase):
             with self.subTest(number=number, body=body):
                 with self.assertRaises(ValueError): m.linked_issue(number, body)
 
+    def test_existing_scoped_pr_closing_formats(self):
+        # Exact lines confirmed by GET-only live projections in run20.
+        # These are parser fixtures, not hosted admission or deployment evidence.
+        m = self.helper()
+        cases = ((2, 1, 'Closes #1 (repository milestone only).'),
+                 (4, 3, 'Closes #3 (repository milestone only): '
+                  'https://github.com/timmypai/agent-delivery-status/issues/3'))
+        for number, issue, line in cases:
+            with self.subTest(number=number):
+                self.assertEqual(m.linked_issue(number, line), issue)
+                self.assertEqual(m.linked_issue(number, 'Summary\n\n'+line+'\n\nDetails'), issue)
+
+    def test_closing_formats_reject_ambiguity_and_untrusted_suffixes(self):
+        m = self.helper()
+        historical = 'Closes #3 (repository milestone only): '
+        url = 'https://github.com/timmypai/agent-delivery-status/issues/3'
+        cases = (
+            (2, 'Closes #3 (repository milestone only).'),
+            (4, 'Closes #1 (repository milestone only).'),
+            (8, 'Closes #9 (repository milestone only).'),
+            (2, 'Closes #1 (repository milestone only).\nFixes #9'),
+            (4, historical+url+'\nCloses other/repo#9'),
+            (8, 'Closes #9\nCloses other/repo#10'),
+            (8, 'Closes #9\nFixes #10; echo INJECTION'),
+            (8, 'Closes #9\nResolves https://github.com/other/repo/issues/10'),
+            (8, 'Closes #9\nFixes #9'),
+            (4, historical+url.replace('timmypai/', 'other/')),
+            (4, historical+url.replace('/issues/3', '/issues/1')),
+            (4, historical+url+'?token=INJECTION'),
+            (4, historical+url+'#fragment'),
+            (4, historical+url+'; echo INJECTION'),
+            (4, historical+url+'$(echo INJECTION)'),
+            (4, historical+'https://user:INJECTION@github.com/timmypai/agent-delivery-status/issues/3'),
+            (2, 'Closes #1; echo INJECTION'),
+            (2, 'Closes #1 (repository milestone only).$(echo INJECTION)'),
+            (2, 'Closes #1 (repository milestone only).\x00'),
+            (8, 'Closes #9 and #10'),
+        )
+        for number, body in cases:
+            with self.subTest(number=number, body=body):
+                with self.assertRaises(ValueError):
+                    m.linked_issue(number, body)
+
+    def test_future_pr_retains_strict_standalone_contract(self):
+        m = self.helper()
+        for line in ('Closes #9', 'Fixes #9.', 'resolves #9', '  Closes #9  '):
+            with self.subTest(line=line):
+                self.assertEqual(m.linked_issue(8, 'Summary\n'+line+'\nDetails'), 9)
+        for body in ('Closes #0', 'Closes #09', 'Closes https://github.com/timmypai/agent-delivery-status/issues/9',
+                     'Closes #9 (repository milestone only).', 'Closes #9 arbitrary suffix'):
+            with self.subTest(body=body):
+                with self.assertRaises(ValueError):
+                    m.linked_issue(8, body)
+
     def test_event_validation_rejects_fork_private_and_bad_sha(self):
         m = self.helper()
         repo = {'full_name': m.REPO, 'private': False}

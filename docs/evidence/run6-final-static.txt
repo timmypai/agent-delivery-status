@@ -1,0 +1,4 @@
+spec.md a8fb9f3643fd3fae2a772dd90da5d0f8d2a0f91e419c0acae8f13ee6561bcb4d
+acceptance-matrix.md 622776b50d2d81d05b059613e89032a9d6a225b88720269fa51d0bb87f7e7471
+PASS: manual-only jobs, no conditional bypass, shell parsing, Python AST, no eval/exec/shell=True, real HTTP tests unconditional, source whitespace, exact Architect imports.
+Scope: lightweight static assertions/manual source review; no third-party linter/type checker/security scanner installed or run. No socket, Docker or network invoked.

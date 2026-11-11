@@ -1,0 +1,6 @@
+test_version_reports_build_and_deployment (test_app.AppTests.test_version_reports_build_and_deployment) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+OK

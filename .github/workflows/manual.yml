@@ -1,0 +1,93 @@
+{
+  "name": "Manual verification (budget authorization required)",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "issue_url": {
+          "description": "Verified repository Issue URL",
+          "required": true,
+          "type": "string"
+        },
+        "pr_url": {
+          "description": "Verified PR URL whose head equals selected workflow ref",
+          "required": true,
+          "type": "string"
+        }
+      }
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "jobs": {
+    "test": {
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 10,
+      "steps": [
+        {
+          "uses": "actions/checkout@v4",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/setup-python@v5",
+          "with": {
+            "python-version": "3.14"
+          }
+        },
+        {
+          "name": "Record actual checkout",
+          "run": "git rev-parse HEAD"
+        },
+        {
+          "name": "Behavior tests",
+          "run": "python -m unittest discover -s tests -v"
+        },
+        {
+          "name": "Syntax checks",
+          "run": "PYTHONPYCACHEPREFIX=\"$GITHUB_WORKSPACE/.cache/pycache\" python -m compileall -q app.py scripts tests"
+        }
+      ]
+    },
+    "docker-smoke": {
+      "needs": "test",
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 10,
+      "env": {
+        "ISSUE_URL": "${{ inputs.issue_url }}",
+        "PR_URL": "${{ inputs.pr_url }}",
+        "CI_URL": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+        "IMAGE_TAG": "delivery-status-smoke:${{ github.sha }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@v4",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/setup-python@v5",
+          "with": {
+            "python-version": "3.14"
+          }
+        },
+        {
+          "name": "Verify exact checkout",
+          "run": "test \"$(git rev-parse HEAD)\" = \"$GITHUB_SHA\""
+        },
+        {
+          "name": "Build exact checkout (no push)",
+          "run": "sh scripts/build-image.sh"
+        },
+        {
+          "name": "Real container HTTP and negative smoke (synthetic receipt only)",
+          "run": "python scripts/docker_smoke.py --image \"$IMAGE_TAG\" --metadata build-metadata.json"
+        }
+      ]
+    }
+  }
+}

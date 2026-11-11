@@ -1,0 +1,6 @@
+test_invalid_unicode_receipt_fails_closed (tests.test_app.AppTests.test_invalid_unicode_receipt_fails_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.022s
+
+OK

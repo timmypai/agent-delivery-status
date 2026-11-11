@@ -1,0 +1,25 @@
+test_container_and_workflow_definition_boundaries (test_build.BuildTests.test_container_and_workflow_definition_boundaries) ... FAIL
+test_metadata_producer_requires_evidence_and_uses_actual_head (test_build.BuildTests.test_metadata_producer_requires_evidence_and_uses_actual_head) ... FAIL
+
+======================================================================
+FAIL: test_container_and_workflow_definition_boundaries (test_build.BuildTests.test_container_and_workflow_definition_boundaries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_build.py", line 38, in test_container_and_workflow_definition_boundaries
+    self.assertTrue((ROOT/'Dockerfile').exists(), 'Docker definition required')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Docker definition required
+
+======================================================================
+FAIL: test_metadata_producer_requires_evidence_and_uses_actual_head (test_build.BuildTests.test_metadata_producer_requires_evidence_and_uses_actual_head)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_build.py", line 16, in test_metadata_producer_requires_evidence_and_uses_actual_head
+    self.assertTrue(script.exists(), 'Metadata producer required')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : Metadata producer required
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.001s
+
+FAILED (failures=2)

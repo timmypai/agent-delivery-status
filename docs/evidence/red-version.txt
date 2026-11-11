@@ -1,0 +1,18 @@
+test_version_reports_build_and_deployment (test_app.AppTests.test_version_reports_build_and_deployment) ... FAIL
+
+======================================================================
+FAIL: test_version_reports_build_and_deployment (test_app.AppTests.test_version_reports_build_and_deployment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 37, in test_version_reports_build_and_deployment
+    status, content_type, body = self.app().response('/version')
+                                 ~~~~~~~~^^
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_app.py", line 33, in app
+    self.assertIsNotNone(importlib.util.find_spec('app'), 'Application module is required')
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : Application module is required
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)

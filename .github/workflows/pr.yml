@@ -1,0 +1,32 @@
+{
+  "name": "PR exact-head verification (public standard runners)",
+  "on": {"pull_request": {"types": ["opened", "synchronize", "reopened", "ready_for_review", "edited"]}},
+  "permissions": {"contents": "read", "pull-requests": "read", "issues": "read", "actions": "read", "checks": "read"},
+  "jobs": {
+    "pr-tests": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "env": {"PYTHONDONTWRITEBYTECODE": "1"},
+      "steps": [
+        {"uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", "with": {"ref": "${{ github.event.pull_request.head.sha }}", "persist-credentials": false}},
+        {"uses": "actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", "with": {"python-version": "3.14"}},
+        {"name": "Verify head, public budget, metadata and check association", "env": {"GH_TOKEN": "${{ github.token }}"}, "run": "python scripts/ci_pr.py --job pr-tests"},
+        {"name": "Full real HTTP and negative behavior suite", "run": "python -m unittest discover -s tests -v"},
+        {"name": "Python and shell syntax", "run": "python scripts/ci_pr.py --syntax"}
+      ]
+    },
+    "pr-docker-smoke": {
+      "needs": "pr-tests",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "env": {"PYTHONDONTWRITEBYTECODE": "1"},
+      "steps": [
+        {"uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", "with": {"ref": "${{ github.event.pull_request.head.sha }}", "persist-credentials": false}},
+        {"uses": "actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", "with": {"python-version": "3.14"}},
+        {"name": "Verify head, public budget, metadata and check association", "env": {"GH_TOKEN": "${{ github.token }}"}, "run": "python scripts/ci_pr.py --job pr-docker-smoke"},
+        {"name": "Build actual exact-head image (no push)", "run": "sh scripts/build-image.sh"},
+        {"name": "Real container HTTP/negative smoke; synthetic receipt NOT deployment", "run": "python scripts/docker_smoke.py --image \"$IMAGE_TAG\" --metadata build-metadata.json"}
+      ]
+    }
+  }
+}

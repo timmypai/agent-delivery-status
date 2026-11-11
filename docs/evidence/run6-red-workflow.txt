@@ -1,0 +1,15 @@
+test_container_and_workflow_definition_boundaries (tests.test_build.BuildTests.test_container_and_workflow_definition_boundaries) ... FAIL
+
+======================================================================
+FAIL: test_container_and_workflow_definition_boundaries (tests.test_build.BuildTests.test_container_and_workflow_definition_boundaries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/data/agent-team/projects/delivery-status/repo/tests/test_build.py", line 47, in test_container_and_workflow_definition_boundaries
+    self.assertIn('docker-smoke',workflow['jobs'])
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'docker-smoke' not found in {'test': {'runs-on': 'ubuntu-latest', 'timeout-minutes': 10, 'steps': [{'uses': 'actions/checkout@v4', 'with': {'ref': '${{ github.sha }}', 'persist-credentials': False}}, {'uses': 'actions/setup-python@v5', 'with': {'python-version': '3.14'}}, {'name': 'Record actual checkout', 'run': 'git rev-parse HEAD'}, {'name': 'Behavior tests', 'run': 'python -m unittest discover -s tests -v'}, {'name': 'Syntax checks', 'run': 'python -m compileall -q app.py scripts tests'}]}}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
